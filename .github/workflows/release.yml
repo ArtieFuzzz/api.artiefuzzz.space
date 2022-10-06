@@ -12,7 +12,7 @@ env:
 
 jobs:
   Rust:
-    name: Build and Push Rust codespace image
+    name: Publish / Release Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository

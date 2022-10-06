@@ -6,7 +6,7 @@ RUN apt-get update -y
 RUN apt-get upgrade -y --no-install-recommends
 RUN apt-get install -y --no-install-recommends curl libssl-dev
 # Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+RUN curl https://sh.rustup.rs -sSf | sh
 
 # Build release files
 RUN cargo build --release

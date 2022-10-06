@@ -13,7 +13,7 @@ RUN cargo build --release
 
   # Clean-up
   RUN rm -r ./src
-  RUN mv ./target/release/TEMPLATE /usr/local/bin
-  RUN chmod +x /usr/local/bin/TEMPLATE
+  RUN mv ./target/release/api /usr/local/bin
+  RUN chmod +x /usr/local/bin/api
   # Set CMD
-  CMD ./target/release/TEMPLATE # REPLACE THIS
+  CMD api

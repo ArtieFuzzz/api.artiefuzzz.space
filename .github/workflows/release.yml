@@ -33,7 +33,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Build and push Rust Codespace Docker image
+      - name: Build & Push
         uses: docker/build-push-action@v3
         with:
           push: true

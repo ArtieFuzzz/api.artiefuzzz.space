@@ -4,7 +4,7 @@ WORKDIR /service
 # Update and Install tools and dependencies
 RUN apt-get update -y
 RUN apt-get upgrade -y --no-install-recommends
-RUN apt-get install -y --no-install-recommends curl libssl-dev ca-certificates
+RUN apt-get install -y --no-install-recommends curl libssl-dev ca-certificates build-essential gcc
 # Install Rust
 RUN curl https://sh.rustup.rs -sSf | sh
 

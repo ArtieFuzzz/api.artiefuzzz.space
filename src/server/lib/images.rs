@@ -1,11 +1,8 @@
 use lazy_static::lazy_static;
 use rand::seq::SliceRandom;
-use s3::bucket::Bucket;
-use s3::creds::Credentials;
-use s3::Region;
-use std::env::var;
 use std::error::Error;
 use std::sync::{Arc, RwLock};
+use super::s3_client;
 
 #[derive(Debug)]
 pub struct ImageCache {
@@ -37,17 +34,7 @@ lazy_static! {
 const IMG_BASE_URL: &'static str = "https://img.artiefuzzz.space";
 
 pub async fn init() -> Result<(), Box<dyn Error>> {
-    let region = Region::Custom {
-        region: "us-west".to_owned(),
-        endpoint: "s3.us-west-000.backblazeb2.com".to_owned(),
-    };
-
-    let access_key = var("B2_KEY_ID")?;
-    let key_id = var("B2_KEY")?;
-
-    let credentials = Credentials::new(Some(&access_key), Some(&key_id), None, None, None)?;
-    let bucket = Bucket::new(&var("B2_BUCKET_ID")?, region, credentials)?;
-
+    let bucket = s3_client::get_bucket()?;
     let results = bucket
         .list_page("".to_string(), None, None, None, None)
         .await?;

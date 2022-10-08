@@ -19,11 +19,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let addr = format!("{}:{}", env::var("BIND_ADDRESS")?, env::var("BIND_PORT")?)
         .parse::<SocketAddr>()?;
 
-    let cache_timer = Stopwatch::new();
-    // Build the Image cache
-    server::lib::images::init().await?;
-    let cache_time = cache_timer.stop();
-    info!("Image cache Built in {}ms", cache_time);
+    build_cache().await?;
 
     let index = warp::path::end().and(warp::get()).and_then(routes::index);
     let random_image = warp::path!("images" / "random")
@@ -48,6 +44,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     warp::serve(routes).run(addr).await;
 
     Ok(())
+}
+
+async fn build_cache() -> Result<(), Box<dyn Error>> {
+  let cache_timer = Stopwatch::new();
+  server::lib::images::init().await?;
+  let cache_time = cache_timer.stop();
+  info!("Image cache Built in {}ms", cache_time);
+
+  Ok(())
 }
 
 async fn handle_rejection(rejection: warp::Rejection) -> Result<impl warp::Reply, Infallible> {

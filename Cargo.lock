@@ -33,13 +33,14 @@ dependencies = [
 
 [[package]]
 name = "api"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "chrono",
  "dotenv",
  "lazy_static",
  "rand",
  "rust-s3",
+ "serde",
  "tokio",
  "tracing",
  "tracing-subscriber",

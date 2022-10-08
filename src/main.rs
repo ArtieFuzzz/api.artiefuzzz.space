@@ -1,15 +1,15 @@
 mod server;
 
-use std::{convert::Infallible, error::Error, net::SocketAddr};
+use server::lib::stopwatch::Stopwatch;
 use server::routes;
 use std::env;
+use std::{convert::Infallible, error::Error, net::SocketAddr};
 use tracing::{info, warn};
 use warp::{
     self,
     http::{Response, StatusCode},
     Filter,
 };
-use server::lib::stopwatch::Stopwatch;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -25,13 +25,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let cache_time = cache_timer.stop();
     info!("Image cache Built in {}ms", cache_time);
 
-    let index = warp::get().and_then(routes::index);
-    let list_files = warp::path!("list_images")
+    let index = warp::path::end().and(warp::get()).and_then(routes::index);
+    let random_image = warp::path!("images" / "random")
         .and(warp::get())
-        .and_then(routes::list_images);
+        .and_then(routes::random);
+    let meme_image = warp::path!("images" / "meme")
+        .and(warp::get())
+        .and_then(routes::random_meme);
 
     let routes = warp::any()
-        .and(list_files.or(index))
+        .and(index.or(random_image).or(meme_image))
         .recover(handle_rejection);
 
     tokio::spawn(async move {

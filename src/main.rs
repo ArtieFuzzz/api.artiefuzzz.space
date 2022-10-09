@@ -3,13 +3,17 @@ mod server;
 use server::lib::stopwatch::Stopwatch;
 use server::routes;
 use std::env;
+use std::time::Duration;
 use std::{convert::Infallible, error::Error, net::SocketAddr};
+use tokio::time;
 use tracing::{info, warn};
 use warp::{
     self,
     http::{Response, StatusCode},
     Filter,
 };
+
+use crate::server::lib::images::CACHE;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -18,6 +22,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let addr = format!("{}:{}", env::var("BIND_ADDRESS")?, env::var("BIND_PORT")?)
         .parse::<SocketAddr>()?;
+
+    info!("Starting the API server...");
 
     build_cache().await?;
 
@@ -33,6 +39,19 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .and(index.or(random_image).or(meme_image))
         .recover(handle_rejection);
 
+    let mut interval = time::interval(Duration::new(3600, 0));
+
+    // Handler to renew the cache every hour
+    tokio::spawn(async move {
+        interval.tick().await;
+
+        loop {
+            interval.tick().await;
+
+            tokio::spawn(rebuild_cache());
+        }
+    });
+
     tokio::spawn(async move {
         tokio::signal::ctrl_c()
             .await
@@ -47,12 +66,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
 }
 
 async fn build_cache() -> Result<(), Box<dyn Error>> {
-  let cache_timer = Stopwatch::new();
-  server::lib::images::init().await?;
-  let cache_time = cache_timer.stop();
-  info!("Image cache Built in {}ms", cache_time);
+    let cache_timer = Stopwatch::new();
+    server::lib::images::populate().await?;
+    let cache_time = cache_timer.stop();
+    info!("Image cache Built in {}ms", cache_time); 
 
-  Ok(())
+    Ok(())
+}
+
+async fn rebuild_cache() {
+    let cache_timer = Stopwatch::new();
+    CACHE.write().ok().unwrap().clear();
+    server::lib::images::populate().await.unwrap();
+    let cache_time = cache_timer.stop();
+    info!("Image cache Rebuilt in {}ms", cache_time);
 }
 
 async fn handle_rejection(rejection: warp::Rejection) -> Result<impl warp::Reply, Infallible> {

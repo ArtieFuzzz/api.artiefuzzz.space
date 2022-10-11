@@ -1,6 +1,8 @@
 mod server;
+mod models;
 
 use server::lib::stopwatch::Stopwatch;
+use server::rejections::NoUserAgent;
 use server::routes;
 use std::env;
 use std::time::Duration;
@@ -13,6 +15,7 @@ use warp::{
     Filter,
 };
 
+use crate::server::lib::postgres;
 use crate::server::lib::images::CACHE;
 
 #[tokio::main]
@@ -25,6 +28,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     info!("Starting the API server...");
 
+    postgres::pq_connect();
     build_cache().await?;
 
     let index = warp::path::end().and(warp::get()).and_then(routes::index);
@@ -89,6 +93,9 @@ async fn handle_rejection(rejection: warp::Rejection) -> Result<impl warp::Reply
     if rejection.is_not_found() {
         message = "NOT_FOUND";
         code = StatusCode::NOT_FOUND;
+    } else if rejection.find::<NoUserAgent>().is_some() {
+        message = "NO_HEADERS";
+        code = StatusCode::BAD_REQUEST;
     } else {
         eprintln!("Unhandled rejection: {:?}", rejection);
 

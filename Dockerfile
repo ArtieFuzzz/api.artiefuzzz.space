@@ -6,7 +6,7 @@ SHELL ["/bin/bash", "-c"]
 # Update and Install tools and dependencies
 RUN apt-get update -y
 RUN apt-get upgrade -y --no-install-recommends
-RUN apt-get install -y --no-install-recommends libssl-dev ca-certificates build-essential gcc pkg-config
+RUN apt-get install -y --no-install-recommends libssl-dev ca-certificates build-essential gcc pkg-config libpq
 
 COPY . .
 

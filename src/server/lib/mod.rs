@@ -1,4 +1,5 @@
+pub mod auth;
 pub mod images;
-pub mod stopwatch;
-mod s3_client;
 pub mod postgres;
+mod s3_client; // Internal
+pub mod stopwatch;

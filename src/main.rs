@@ -1,5 +1,6 @@
 mod server;
 mod models;
+mod schema;
 
 use server::lib::stopwatch::Stopwatch;
 use server::rejections::NoUserAgent;

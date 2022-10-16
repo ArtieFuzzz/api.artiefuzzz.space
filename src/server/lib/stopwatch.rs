@@ -4,6 +4,7 @@ pub struct Stopwatch {
     start: Instant,
 }
 
+#[allow(dead_code)]
 impl Stopwatch {
     pub fn new() -> Self {
         return Stopwatch {

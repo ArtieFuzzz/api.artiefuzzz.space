@@ -10,5 +10,6 @@ pub struct Login {
 #[derive(Insertable)]
 #[table_name="logins"]
 pub struct CreateLogin {
+  pub username: String,
   pub pwd: String
 }

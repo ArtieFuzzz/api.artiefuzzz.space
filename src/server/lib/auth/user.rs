@@ -3,7 +3,7 @@
  * 
  * Combines:
  * 
- * ./auth/jwt.rs
+ * ./jwt.rs
  * ../postgres.rs
  * 
  * ------------------
@@ -15,4 +15,8 @@ pub fn register_user() {
 
 pub fn login_user() {
   // Check if credentials match the DBs, generate a token with the `sub` as the username, token automatically expire in 24 hours
+}
+
+pub fn hash_pwd(pwd: &str) -> String {
+  String::from("Placeholder")
 }
